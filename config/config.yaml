@@ -1,0 +1,22 @@
+artifacts_root: artifacts
+
+data_ingestion:
+  root_dir: artifacts/data_ingestion
+  source_URL: nazmul0087/ct-kidney-dataset-normal-cyst-tumor-and-stone
+  local_data_file: artifacts/data_ingestion/data_dir
+
+data_splitting:
+  root_dir: artifacts/data_ingestion/data_dir/CT-KIDNEY-DATASET-Normal-Cyst-Tumor-Stone/CT-KIDNEY-DATASET-Normal-Cyst-Tumor-Stone
+  train_data_dir: artifacts/data_splitting/train 
+  test_data_dir: artifacts/data_splitting/test
+  split_ratio: 0.2
+
+prepare_base_model:
+  root_dir: artifacts/prepare_base_model
+  base_model_path: artifacts/prepare_base_model/base_model.pth
+
+
+training:
+  root_dir: artifacts/training
+  trained_model_path: artifacts/training/trained_model.pth
+  base_model_path: artifacts/prepare_base_model/base_model.pth

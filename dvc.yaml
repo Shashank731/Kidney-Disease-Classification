@@ -1,0 +1,69 @@
+stages:
+
+  data_ingestion:
+    cmd: python src/kidney_disease_prediction/pipeline/stage_01_data_ingestion.py
+    deps:
+      - src/kidney_disease_prediction/components/data_ingestion.py
+      - src/kidney_disease_prediction/pipeline/stage_01_data_ingestion.py
+      - config/config.yaml
+    outs:
+      - artifacts/data_ingestion
+
+  data_splitting:
+    cmd: python src/kidney_disease_prediction/pipeline/stage_011_data_splitting.py
+    deps:
+      - src/kidney_disease_prediction/components/data_splitting.py
+      - src/kidney_disease_prediction/pipeline/stage_011_data_splitting.py
+      - artifacts/data_ingestion
+      - config/config.yaml
+    outs:
+      - artifacts/data_splitting
+
+  prepare_base_model:
+    cmd: python src/kidney_disease_prediction/pipeline/stage_02_prepare_base_model.py
+    deps:
+      - src/kidney_disease_prediction/components/prepare_base_model.py
+      - src/kidney_disease_prediction/pipeline/stage_02_prepare_base_model.py
+      - config/config.yaml
+    params:
+      - CLASSES
+      - INCLUDING_TOP
+      - AUGMENTATION
+    outs:
+      - artifacts/prepare_base_model
+
+  model_training:
+    cmd: python src/kidney_disease_prediction/pipeline/stage_03_model_training.py
+    deps:
+      - src/kidney_disease_prediction/components/model_training.py
+      - src/kidney_disease_prediction/pipeline/stage_03_model_training.py
+      - artifacts/data_splitting
+      - artifacts/prepare_base_model
+      - config/config.yaml
+    params:
+      - CLASSES
+      - BATCH_SIZE
+      - LEARNING_RATE
+      - EPOCHS
+      - AUGMENTATION
+      - MODEL_NAME
+    outs:
+      - artifacts/training
+
+  model_evaluation:
+    cmd: python src/kidney_disease_prediction/pipeline/stage_04_model_evaluation.py
+    deps:
+      - src/kidney_disease_prediction/components/model_evaluation_mlflow.py
+      - src/kidney_disease_prediction/pipeline/stage_04_model_evaluation.py
+      - artifacts/training
+      - artifacts/data_splitting
+      - config/config.yaml
+    params:
+      - CLASSES
+      - BATCH_SIZE
+      - MODEL_NAME
+      - IMAGE_SIZE
+      - LEARNING_RATE
+    metrics:
+      - scores.json:
+          cache: false

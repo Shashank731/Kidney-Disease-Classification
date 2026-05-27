@@ -1,0 +1,160 @@
+schema: '2.0'
+stages:
+  data_ingestion:
+    cmd: python 
+      src/kidney_disease_prediction/pipeline/stage_01_data_ingestion.py
+    deps:
+    - path: config/config.yaml
+      hash: md5
+      md5: d9f82303437a8214549508c94dee7a92
+      size: 756
+    - path: src/kidney_disease_prediction/components/data_ingestion.py
+      hash: md5
+      md5: 0ff5ff146aab39ab9e8f64a0a233366a
+      size: 1132
+    - path: src/kidney_disease_prediction/pipeline/stage_01_data_ingestion.py
+      hash: md5
+      md5: 412702b3a63b18f728d07a8c810dd7be
+      size: 1053
+    outs:
+    - path: artifacts/data_ingestion
+      hash: md5
+      md5: 1f75713a2c84deeb33cc99c3a0eabfac.dir
+      size: 1663086237
+      nfiles: 12447
+  data_splitting:
+    cmd: python 
+      src/kidney_disease_prediction/pipeline/stage_011_data_splitting.py
+    deps:
+    - path: artifacts/data_ingestion
+      hash: md5
+      md5: 1f75713a2c84deeb33cc99c3a0eabfac.dir
+      size: 1663086237
+      nfiles: 12447
+    - path: config/config.yaml
+      hash: md5
+      md5: d9f82303437a8214549508c94dee7a92
+      size: 756
+    - path: src/kidney_disease_prediction/components/data_splitting.py
+      hash: md5
+      md5: 85a4994dccc197471ee0f1a0c4af6341
+      size: 1789
+    - path: src/kidney_disease_prediction/pipeline/stage_011_data_splitting.py
+      hash: md5
+      md5: 4cf7cd08e6410e7a5c08df5f540332c3
+      size: 1127
+    outs:
+    - path: artifacts/data_splitting
+      hash: md5
+      md5: 4ce579cd01018e450502d496db52c1d2.dir
+      size: 1661580918
+      nfiles: 12446
+  prepare_base_model:
+    cmd: python 
+      src/kidney_disease_prediction/pipeline/stage_02_prepare_base_model.py
+    deps:
+    - path: config/config.yaml
+      hash: md5
+      md5: d9f82303437a8214549508c94dee7a92
+      size: 756
+    - path: src/kidney_disease_prediction/components/prepare_base_model.py
+      hash: md5
+      md5: 865219d8497ecb66f3074ca755453df7
+      size: 1209
+    - path: 
+        src/kidney_disease_prediction/pipeline/stage_02_prepare_base_model.py
+      hash: md5
+      md5: 8dcb2c4ea5660e8ad04cc853edf51ef3
+      size: 1212
+    params:
+      params.yaml:
+        AUGMENTATION: true
+        CLASSES: 4
+        INCLUDING_TOP: false
+    outs:
+    - path: artifacts/prepare_base_model
+      hash: md5
+      md5: 01edf0ad466917c60230a77ef988014b.dir
+      size: 28428840
+      nfiles: 1
+  model_training:
+    cmd: python 
+      src/kidney_disease_prediction/pipeline/stage_03_model_training.py
+    deps:
+    - path: artifacts/data_splitting
+      hash: md5
+      md5: 4ce579cd01018e450502d496db52c1d2.dir
+      size: 1661580918
+      nfiles: 12446
+    - path: artifacts/prepare_base_model
+      hash: md5
+      md5: 01edf0ad466917c60230a77ef988014b.dir
+      size: 28428840
+      nfiles: 1
+    - path: config/config.yaml
+      hash: md5
+      md5: d9f82303437a8214549508c94dee7a92
+      size: 756
+    - path: src/kidney_disease_prediction/components/model_training.py
+      hash: md5
+      md5: 7de4ddf837c41b5ead789ee185f5d438
+      size: 3868
+    - path: src/kidney_disease_prediction/pipeline/stage_03_model_training.py
+      hash: md5
+      md5: c72b35a738172f9e42806d8fb8d39107
+      size: 1208
+    params:
+      params.yaml:
+        AUGMENTATION: true
+        BATCH_SIZE: 8
+        CLASSES: 4
+        EPOCHS: 6
+        LEARNING_RATE: 0.0001
+        MODEL_NAME: densenet121
+    outs:
+    - path: artifacts/training
+      hash: md5
+      md5: 70890e9e16812fd7c3ad5a2f76ccae14.dir
+      size: 28441215
+      nfiles: 1
+  model_evaluation:
+    cmd: python 
+      src/kidney_disease_prediction/pipeline/stage_04_model_evaluation.py
+    deps:
+    - path: artifacts/data_splitting
+      hash: md5
+      md5: 4ce579cd01018e450502d496db52c1d2.dir
+      size: 1661580918
+      nfiles: 12446
+    - path: artifacts/training
+      hash: md5
+      md5: 70890e9e16812fd7c3ad5a2f76ccae14.dir
+      size: 28441215
+      nfiles: 1
+    - path: config/config.yaml
+      hash: md5
+      md5: d9f82303437a8214549508c94dee7a92
+      size: 756
+    - path: src/kidney_disease_prediction/components/model_evaluation_mlflow.py
+      hash: md5
+      md5: 6dfcd1d64442d5aebc91522275052ca0
+      size: 4119
+    - path: src/kidney_disease_prediction/pipeline/stage_04_model_evaluation.py
+      hash: md5
+      md5: bd0fa469c34b2e8502c694fa8ae913cc
+      size: 980
+    params:
+      params.yaml:
+        BATCH_SIZE: 8
+        CLASSES: 4
+        IMAGE_SIZE:
+        - 224
+        - 224
+        - 3
+        LEARNING_RATE: 0.0001
+        MODEL_NAME: densenet121
+    outs:
+    - path: scores.json
+      hash: md5
+      md5: cefc0525af0aba487ed89f35204d875c
+      size: 69
