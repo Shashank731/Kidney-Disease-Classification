@@ -20,24 +20,45 @@ class PredictionPipeline:
         model.load_state_dict(torch.load(model_path, map_location=self.device))
         return model
 
-    def predict(self, image) -> int:
+    def predict(self, image):
+
         transform = transforms.Compose([
             transforms.Lambda(lambda x: x.convert("RGB")),
             transforms.Resize((224, 224)),
             transforms.ToTensor(),
-            transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
-        ])
+            transforms.Normalize(
+                mean=[0.485, 0.456, 0.406],
+                std=[0.229, 0.224, 0.225]
+            )
+       ])
 
         image = transform(image).unsqueeze(0).to(self.device)
 
         with torch.no_grad():
+
             output = self.model(image)
-            _, predicted = torch.max(output, 1)
-        
+
+            probabilities = torch.softmax(
+                output,
+                dim=1
+            )
+
+            confidence, predicted = torch.max(
+                probabilities,
+                1
+            )
+
         class_names = {
             0: "Cyst",
             1: "Normal",
             2: "Stone",
             3: "Tumor"
         }
-        return class_names[predicted.item()]
+
+        prediction = class_names[predicted.item()]
+
+        confidence = (
+            confidence.item() * 100
+        )
+
+        return prediction, confidence
