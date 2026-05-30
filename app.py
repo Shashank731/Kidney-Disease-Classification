@@ -11,9 +11,8 @@ st.set_page_config(
 @st.cache_resource
 def load_predictor():
     return PredictionPipeline(
-        "artifacts/training/trained_model.pth"
+        "models/trained_model.pth"
     )
-
 predictor = load_predictor()
 
 st.title("🩺 Kidney Disease Classification")
