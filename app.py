@@ -21,19 +21,31 @@ st.markdown(
 )
 
 with st.sidebar:
+
     st.header("About")
-    st.write(
-        """
-        This AI system classifies Kidney CT scans into:
-        - Cyst
-        - Normal
-        - Stone
-        - Tumor
-        """
+
+    st.write("""
+    This AI system classifies Kidney CT scans into:
+
+    - Cyst
+    - Normal 
+    - Stone
+    - Tumor
+    """)
+
+    st.metric(
+        "Validation Accuracy",
+        "97.47%"
     )
 
-    st.info(
-        "Upload only Kidney CT scan images."
+    st.metric(
+        "Training Images",
+        "9955"
+    )
+
+    st.metric(
+        "Model",
+        "DenseNet121"
     )
 
 uploaded_file = st.file_uploader(
